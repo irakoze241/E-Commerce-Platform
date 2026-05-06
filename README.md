@@ -176,4 +176,3 @@ Set during setup — access the admin panel at `/admin/`.
 - Cart data is stored in the user's browser session
 - Stock levels are decremented automatically when an order is placed
 
----
