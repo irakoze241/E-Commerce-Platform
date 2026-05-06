@@ -177,5 +177,3 @@ Set during setup — access the admin panel at `/admin/`.
 - Stock levels are decremented automatically when an order is placed
 
 ---
-
-*Built with ❤️ as a student portfolio project — AmaliTech Training.*
