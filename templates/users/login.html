@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block title %}Login — ShopEase{% endblock %}
+{% block meta_description %}Log in to your ShopEase account to access your cart and order history.{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+  <div class="auth-card">
+
+    <!-- Icon -->
+    <div class="auth-icon">
+      <i class="bi bi-person-fill text-white"></i>
+    </div>
+
+    <h2 class="text-center fw-bold mb-1">Welcome Back</h2>
+    <p class="text-center text-muted small mb-4">Sign in to continue to ShopEase</p>
+
+    <form action="{% url 'login' %}" method="post" id="login-form">
+      {% csrf_token %}
+
+      <!-- Username -->
+      <div class="mb-3">
+        <label for="id_login_username" class="form-label">
+          <i class="bi bi-person me-1"></i>Username
+        </label>
+        <input type="text" name="username" id="id_login_username"
+               class="form-control {% if form.errors %}is-invalid{% endif %}"
+               placeholder="Enter your username"
+               value="{{ form.data.username|default:'' }}"
+               autocomplete="username" required />
+      </div>
+
+      <!-- Password -->
+      <div class="mb-3">
+        <label for="id_login_password" class="form-label">
+          <i class="bi bi-lock me-1"></i>Password
+        </label>
+        <div class="input-group">
+          <input type="password" name="password" id="id_login_password"
+                 class="form-control {% if form.errors %}is-invalid{% endif %}"
+                 placeholder="Enter your password"
+                 autocomplete="current-password" required />
+          <button class="btn btn-outline-secondary" type="button" id="toggle-password-btn"
+                  onclick="togglePassword()" style="border-color:var(--border);color:var(--text-muted);">
+            <i class="bi bi-eye" id="password-eye-icon"></i>
+          </button>
+        </div>
+        {% if form.non_field_errors %}
+          <div class="text-danger small mt-1">
+            <i class="bi bi-exclamation-circle me-1"></i>{{ form.non_field_errors.0 }}
+          </div>
+        {% endif %}
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100 btn-lg mb-3" id="login-submit-btn">
+        <i class="bi bi-box-arrow-in-right me-2"></i>Login
+      </button>
+    </form>
+
+    <hr style="border-color:var(--border);" />
+
+    <p class="text-center text-muted small mb-0">
+      Don't have an account?
+      <a href="{% url 'register' %}" class="text-accent fw-semibold" id="go-register-link">
+        Create one free
+      </a>
+    </p>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function togglePassword() {
+  const input = document.getElementById('id_login_password');
+  const icon  = document.getElementById('password-eye-icon');
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.classList.replace('bi-eye', 'bi-eye-slash');
+  } else {
+    input.type = 'password';
+    icon.classList.replace('bi-eye-slash', 'bi-eye');
+  }
+}
+</script>
+{% endblock %}

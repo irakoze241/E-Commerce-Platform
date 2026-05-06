@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% block title %}Shopping Cart — ShopEase{% endblock %}
+{% block meta_description %}Review your cart items and proceed to checkout.{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <div class="d-flex align-items-center mb-4 gap-3">
+    <h1 class="page-section-title mb-0"><i class="bi bi-cart3 me-2 text-accent"></i>Shopping Cart</h1>
+    {% if cart|length > 0 %}
+      <span class="badge bg-primary rounded-pill">{{ cart|length }} item{{ cart|length|pluralize }}</span>
+    {% endif %}
+  </div>
+
+  {% if cart|length > 0 %}
+  <div class="row g-4">
+
+    <!-- Cart Items -->
+    <div class="col-lg-8">
+
+      {% for item in cart %}
+      <div class="cart-item" id="cart-item-{{ item.product.pk }}">
+        <div class="d-flex gap-3 align-items-start">
+
+          <!-- Product Image -->
+          <a href="{% url 'product_detail' item.product.pk %}">
+            {% if item.product.image %}
+              <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" />
+            {% else %}
+              <div class="cart-item-placeholder"><i class="bi bi-bag"></i></div>
+            {% endif %}
+          </a>
+
+          <!-- Details -->
+          <div class="flex-grow-1">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <span class="product-category-tag small">{{ item.product.category.name }}</span>
+                <h6 class="fw-semibold mb-1">
+                  <a href="{% url 'product_detail' item.product.pk %}" class="text-decoration-none text-primary">
+                    {{ item.product.name }}
+                  </a>
+                </h6>
+                <div class="text-muted small mb-2">${{ item.price }} each</div>
+              </div>
+              <!-- Remove -->
+              <a href="{% url 'cart_remove' item.product.pk %}"
+                 class="btn btn-sm btn-outline-danger"
+                 id="remove-btn-{{ item.product.pk }}"
+                 title="Remove item">
+                <i class="bi bi-trash3"></i>
+              </a>
+            </div>
+
+            <!-- Quantity Update Form -->
+            <div class="d-flex align-items-center gap-2 mt-2">
+              <form action="{% url 'cart_add' item.product.pk %}" method="post"
+                    class="d-flex align-items-center gap-2" id="qty-form-{{ item.product.pk }}">
+                {% csrf_token %}
+                <label class="text-muted small mb-0">Qty:</label>
+                <input type="number" name="quantity" value="{{ item.quantity }}"
+                       min="1" max="{{ item.product.stock }}"
+                       class="qty-input form-control form-control-sm"
+                       id="qty-input-{{ item.product.pk }}" />
+                <input type="hidden" name="update" value="True" />
+                <button type="submit" class="btn btn-sm btn-outline-light"
+                        id="update-btn-{{ item.product.pk }}">
+                  <i class="bi bi-arrow-clockwise me-1"></i>Update
+                </button>
+              </form>
+
+              <span class="ms-auto fw-bold text-accent" id="item-total-{{ item.product.pk }}">
+                ${{ item.total_price }}
+              </span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      {% endfor %}
+
+      <!-- Continue Shopping -->
+      <div class="mt-3">
+        <a href="{% url 'product_list' %}" class="btn btn-outline-light" id="continue-shopping-btn">
+          <i class="bi bi-arrow-left me-2"></i>Continue Shopping
+        </a>
+      </div>
+
+    </div>
+
+    <!-- Order Summary -->
+    <div class="col-lg-4">
+      <div class="order-summary">
+        <div class="order-summary-title">
+          <i class="bi bi-receipt me-2 text-accent"></i>Order Summary
+        </div>
+
+        {% for item in cart %}
+        <div class="order-summary-row">
+          <span>{{ item.product.name }} × {{ item.quantity }}</span>
+          <span>${{ item.total_price }}</span>
+        </div>
+        {% endfor %}
+
+        <div class="order-summary-total">
+          <span>Total</span>
+          <span class="text-accent">${{ cart.get_total_price }}</span>
+        </div>
+
+        <div class="mt-3">
+          {% if user.is_authenticated %}
+            <a href="{% url 'checkout' %}" class="btn btn-accent w-100 btn-lg" id="checkout-btn">
+              <i class="bi bi-lock-fill me-2"></i>Proceed to Checkout
+            </a>
+          {% else %}
+            <a href="{% url 'login' %}?next={% url 'checkout' %}" class="btn btn-accent w-100 btn-lg" id="login-to-checkout-btn">
+              <i class="bi bi-box-arrow-in-right me-2"></i>Login to Checkout
+            </a>
+            <p class="text-muted text-center mt-2 small">
+              Don't have an account?
+              <a href="{% url 'register' %}" class="text-accent">Register free</a>
+            </p>
+          {% endif %}
+        </div>
+
+        <!-- Trust badges -->
+        <div class="mt-4 pt-3 border-top" style="border-color:var(--border)!important;">
+          <div class="d-flex flex-column gap-2 text-muted small">
+            <span><i class="bi bi-shield-lock-fill me-2 text-success"></i>Secure SSL checkout</span>
+            <span><i class="bi bi-arrow-return-left me-2 text-accent"></i>Easy 30-day returns</span>
+            <span><i class="bi bi-truck me-2 text-primary"></i>Free delivery on all orders</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  {% else %}
+  <!-- Empty Cart -->
+  <div class="empty-state">
+    <div class="empty-state-icon"><i class="bi bi-cart-x"></i></div>
+    <h4 class="fw-semibold mb-2">Your cart is empty</h4>
+    <p class="text-muted mb-4">Looks like you haven't added anything yet. Start browsing!</p>
+    <a href="{% url 'product_list' %}" class="btn btn-primary btn-lg" id="start-shopping-btn">
+      <i class="bi bi-grid me-2"></i>Start Shopping
+    </a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

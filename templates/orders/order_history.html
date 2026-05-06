@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block title %}My Orders — ShopEase{% endblock %}
+{% block meta_description %}View your complete order history and track the status of your purchases.{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <h1 class="page-section-title mb-0">
+      <i class="bi bi-clock-history me-2 text-accent"></i>My Orders
+    </h1>
+    <a href="{% url 'product_list' %}" class="btn btn-outline-light btn-sm" id="shop-more-btn">
+      <i class="bi bi-grid me-1"></i>Shop More
+    </a>
+  </div>
+
+  {% if orders %}
+    <div class="row g-3">
+      {% for order in orders %}
+      <div class="col-12">
+        <div class="card" id="order-card-{{ order.id }}">
+          <div class="card-body p-4">
+            <div class="row align-items-center g-3">
+
+              <!-- Order ID & Date -->
+              <div class="col-sm-3">
+                <div class="text-muted small mb-1">Order</div>
+                <div class="fw-bold fs-5 text-accent">#{{ order.id }}</div>
+                <div class="text-muted small">{{ order.created_at|date:"d M Y" }}</div>
+              </div>
+
+              <!-- Items preview -->
+              <div class="col-sm-4">
+                <div class="text-muted small mb-1">Items</div>
+                <div class="fw-semibold small">
+                  {% for item in order.items.all|slice:":2" %}
+                    <div class="text-truncate" style="max-width:200px;">
+                      {{ item.product_name }}
+                      <span class="text-muted">×{{ item.quantity }}</span>
+                    </div>
+                  {% endfor %}
+                  {% if order.items.count > 2 %}
+                    <span class="text-muted" style="font-size:0.75rem;">
+                      +{{ order.items.count|add:"-2" }} more item{{ order.items.count|add:"-2"|pluralize }}
+                    </span>
+                  {% endif %}
+                </div>
+              </div>
+
+              <!-- Status -->
+              <div class="col-sm-2">
+                <div class="text-muted small mb-1">Status</div>
+                <span class="status-badge status-{{ order.status }}">
+                  {{ order.get_status_display }}
+                </span>
+              </div>
+
+              <!-- Total -->
+              <div class="col-sm-2">
+                <div class="text-muted small mb-1">Total</div>
+                <div class="fw-bold text-accent">${{ order.total_price }}</div>
+              </div>
+
+              <!-- Action -->
+              <div class="col-sm-1 text-sm-end">
+                <a href="{% url 'order_detail' order.id %}"
+                   class="btn btn-sm btn-outline-light" id="view-order-{{ order.id }}">
+                  <i class="bi bi-eye"></i>
+                </a>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon"><i class="bi bi-bag-x"></i></div>
+      <h4 class="fw-semibold mb-2">No orders yet</h4>
+      <p class="text-muted mb-4">You haven't placed any orders. Start shopping and your orders will appear here.</p>
+      <a href="{% url 'product_list' %}" class="btn btn-primary btn-lg" id="browse-products-btn">
+        <i class="bi bi-grid me-2"></i>Browse Products
+      </a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}
