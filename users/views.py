@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
+from django.views.decorators.http import require_POST
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 from .forms import RegisterForm
@@ -57,8 +58,9 @@ def login_view(request):
     return render(request, 'users/login.html', {'form': form})
 
 
+@require_POST
 def logout_view(request):
-    """Log the user out."""
+    """Log the user out (POST only — required by Django 5+)."""
     logout(request)
     messages.info(request, 'You have been logged out. See you soon!')
     return redirect('product_list')

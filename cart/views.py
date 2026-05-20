@@ -29,8 +29,9 @@ def cart_add(request, product_id):
     return redirect('cart_detail')
 
 
+@require_POST
 def cart_remove(request, product_id):
-    """Remove a product from the cart."""
+    """Remove a product from the cart (POST only — CSRF protected)."""
     cart = Cart(request)
     product = get_object_or_404(Product, id=product_id)
     cart.remove(product)

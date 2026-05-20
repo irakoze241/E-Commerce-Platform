@@ -43,13 +43,15 @@
                 </h6>
                 <div class="text-muted small mb-2">${{ item.price }} each</div>
               </div>
-              <!-- Remove -->
-              <a href="{% url 'cart_remove' item.product.pk %}"
-                 class="btn btn-sm btn-outline-danger"
-                 id="remove-btn-{{ item.product.pk }}"
-                 title="Remove item">
-                <i class="bi bi-trash3"></i>
-              </a>
+              <!-- Remove (POST form — CSRF protected) -->
+              <form action="{% url 'cart_remove' item.product.pk %}" method="post"
+                    class="d-inline" id="remove-form-{{ item.product.pk }}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-danger"
+                        id="remove-btn-{{ item.product.pk }}" title="Remove item">
+                  <i class="bi bi-trash3"></i>
+                </button>
+              </form>
             </div>
 
             <!-- Quantity Update Form -->
